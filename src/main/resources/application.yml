@@ -1,0 +1,38 @@
+micronaut:
+  application:
+    name: bankApi
+  router:
+    static-resources:
+      swagger:
+        paths: classpath:META-INF/swagger
+        mapping: /swagger/**
+      swagger-ui:
+        paths: classpath:META-INF/swagger/views/swagger-ui
+        mapping: /swagger-ui/**
+
+datasources:
+  default:
+    db-type: postgres
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+mongodb:
+  uri: mongodb://localhost:27017/products
+
+jpa:
+  default:
+    packages-to-scan: app.model
+    properties:
+      hibernate:
+        hbm2ddl.auto: update
+        show_sql: true
+        format_sql: true
+
+kafka:
+  consumer:
+    group-id: consumer-group
+  consumer-config:
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer

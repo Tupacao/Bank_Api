@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: app
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, data, data-jpa, hibernate-jpa, http-client-test, java, java-application, jdbc-hikari, junit, kafka, logback, lombok, maven, maven-enforcer-plugin, micronaut-aot, micronaut-http-validation, mockito, netty-server, openapi, postgres, readme, serialization-jackson, shade, static-resources, swagger-ui, test-resources, yaml, yaml-build]
