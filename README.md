@@ -100,8 +100,8 @@ src/
 │   │   │   ├── model/
 │   │   │   ├── protobuf/
 │   │   │   ├── kafka/
-│   │   │   |   ├── consumer/
-│   │   │   |   ├── producer/
+│   │   │      ├── consumer/
+│   │   │      ├── producer/
 |   |   |   ├── repository/
 |   |   |   ├── mapper/
 │   │   ├── resources/
