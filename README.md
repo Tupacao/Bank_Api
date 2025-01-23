@@ -53,7 +53,7 @@ As principais entidades do sistema são:
 
 ## Tecnologias Utilizadas
 - **Framework:** Micronaut
-- **Banco de Dados SQL:** PostgreSQL ou MySQL
+- **Banco de Dados SQL:** PostgreSQL
 - **Banco de Dados NoSQL:** MongoDB
 - **Mensageria:** Kafka
 - **Serialização:** Protocol Buffers (Protobuf)
