@@ -19,7 +19,7 @@ datasources:
     driver-class-name: org.postgresql.Driver
 
 mongodb:
-  uri: mongodb://localhost:27017/products
+  uri: mongodb://localhost:27017/bankApi
 
 jpa:
   default:

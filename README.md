@@ -5,7 +5,7 @@ Este projeto é um sistema backend para gerenciar contas bancárias, permitindo 
 
 ### Modelo de Dados
 As principais entidades do sistema são:
-- **Cliente:** Contém ID, nome, e-mail.
+- **Cliente:** Contém ID, nome, e-mail, senha.
 - **Conta Bancária:** Contém ID, número da conta, saldo, tipo de conta (ex: CORRENTE, POUPANÇA).
 - **Transação:** Relaciona Contas Bancárias, contendo tipo (DEPÓSITO, SAQUE, TRANSFERÊNCIA), valor, data e status (ex: COMPLETA, PENDENTE).
 
@@ -58,7 +58,7 @@ As principais entidades do sistema são:
 - **Mensageria:** Kafka
 - **Serialização:** Protocol Buffers (Protobuf)
 - **Documentação da API:** Swagger (OpenAPI)
-- **Linguagem:** Java 17+
+- **Linguagem:** Java 21
 
 ## Endpoints da API
 
@@ -83,9 +83,10 @@ As principais entidades do sistema são:
 ## Como Executar o Projeto
 
 ### Pré-requisitos
-- Java 17+
-- Docker (para Kafka e MongoDB, se necessário)
-- PostgreSQL ou MySQL
+- Java 21
+- Kafka
+- Mongo Compass
+- PostgreSQL
 - Protoc (para gerar as classes do Protobuf)
 
 ### Configuração
