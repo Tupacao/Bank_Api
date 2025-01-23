@@ -83,8 +83,9 @@ As principais entidades do sistema são:
 ## Como Executar o Projeto
 
 ### Pré-requisitos
-- Java 17+
-- Docker (para Kafka e MongoDB, se necessário)
+- Java 21
+- Kafka
+- Mongo Compass
 - PostgreSQL
 - Protoc (para gerar as classes do Protobuf)
 
