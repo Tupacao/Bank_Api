@@ -1,22 +1,33 @@
 package app.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.TemporalType;
+import jakarta.persistence.GenerationType;
 import jakarta.validation.constraints.NotNull;
+
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "transactions")
 @Setter
 @Getter
 @NoArgsConstructor
+@Entity
+@Table(name = "transactions")
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Temporal(TemporalType.TIMESTAMP)
     @NotNull(message = "Date is mandatory")
