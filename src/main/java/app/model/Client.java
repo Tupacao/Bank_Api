@@ -5,6 +5,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 
 import lombok.Getter;
@@ -13,15 +14,15 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Entity
-@Table(name = "clients")
 @Setter
 @Getter
 @NoArgsConstructor
+@Entity
+@Table(name = "clients")
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "Name is mandatory")
     private String name;
@@ -32,5 +33,6 @@ public class Client {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
+    @OneToMany
     private List<BankAccount> bank_accounts;
 }
