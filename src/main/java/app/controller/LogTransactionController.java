@@ -4,7 +4,13 @@ import app.model.LogTransaction;
 import app.service.LogTransactionService;
 
 import io.micronaut.http.HttpResponse;
-import io.micronaut.http.annotation.*;
+import io.micronaut.http.annotation.Controller;
+import io.micronaut.http.annotation.Get;
+import io.micronaut.http.annotation.Post;
+import io.micronaut.http.annotation.Delete;
+import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.Body;
+import io.micronaut.http.annotation.PathVariable;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -30,13 +36,13 @@ public class LogTransactionController {
     }
 
     @Post("/")
-    public HttpResponse<LogTransaction> createLogTransaction(@Body @Valid LogTransaction client) {
-        return HttpResponse.created(logTransactionService.createLogTransaction(client));
+    public HttpResponse<LogTransaction> createLogTransaction(@Body @Valid LogTransaction logTransaction) {
+        return HttpResponse.created(logTransactionService.createLogTransaction(logTransaction));
     }
 
     @Put("/{id}")
-    public HttpResponse<LogTransaction> updateLogTransaction(@Body @Valid LogTransaction client, @PathVariable Long id) {
-        return HttpResponse.ok(logTransactionService.updateLogTransaction(client, id));
+    public HttpResponse<LogTransaction> updateLogTransaction(@Body @Valid LogTransaction logTransaction, @PathVariable Long id) {
+        return HttpResponse.ok(logTransactionService.updateLogTransaction(logTransaction, id));
     }
 
     @Delete("/{id}")

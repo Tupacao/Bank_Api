@@ -37,13 +37,13 @@ public class BankAccountController {
     }
 
     @Post("/")
-    public HttpResponse<BankAccount> createBankAccount(@Body @Valid BankAccount client) {
-        return HttpResponse.created(bankAccountService.createBankAccount(client));
+    public HttpResponse<BankAccount> createBankAccount(@Body @Valid BankAccount bankAccount) {
+        return HttpResponse.created(bankAccountService.createBankAccount(bankAccount));
     }
 
     @Put("/{id}")
-    public HttpResponse<BankAccount> updateBankAccount(@Body @Valid BankAccount client, @PathVariable Long id) {
-        return HttpResponse.ok(bankAccountService.updateBankAccount(client, id));
+    public HttpResponse<BankAccount> updateBankAccount(@Body @Valid BankAccount bankAccount, @PathVariable Long id) {
+        return HttpResponse.ok(bankAccountService.updateBankAccount(bankAccount, id));
     }
 
     @Delete("/{id}")

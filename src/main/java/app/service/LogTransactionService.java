@@ -25,8 +25,9 @@ public class LogTransactionService {
         throw new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found");
     }
 
-    public LogTransaction updateLogTransaction (LogTransaction logTransaction){
-        if(logTransactionRepository.existsById(logTransaction.getId())){
+    public LogTransaction updateLogTransaction (LogTransaction logTransaction, Long id){
+        if(logTransactionRepository.existsById(id)){
+            logTransaction.setId(id);
             return logTransactionRepository.update(logTransaction);
         }
         throw new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found");

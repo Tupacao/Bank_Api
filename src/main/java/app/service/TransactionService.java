@@ -25,8 +25,9 @@ public class TransactionService {
         throw new LogTransactionException.LogTransactionNotFoundException("Transaction not found");
     }
 
-    public Transaction updateTransaction (Transaction transaction){
-        if(transactionRepository.existsById(transaction.getId())){
+    public Transaction updateTransaction (Transaction transaction, Long id){
+        if(transactionRepository.existsById(id)){
+            transaction.setId(id);
             return transactionRepository.update(transaction);
         }
         throw new LogTransactionException.LogTransactionNotFoundException("Transaction not found");
