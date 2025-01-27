@@ -31,7 +31,7 @@ public class BankAccount {
     @NotNull(message = "Balance is mandatory")
     private double balance;
 
-    @NotBlank(message = "Acount Type is mandatory")
+    @NotBlank(message = "Account Type is mandatory")
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
