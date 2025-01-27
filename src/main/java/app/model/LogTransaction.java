@@ -2,10 +2,10 @@ package app.model;
 
 import io.micronaut.data.annotation.MappedEntity;
 
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Getter;
@@ -13,14 +13,14 @@ import lombok.Setter;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
-@MappedEntity
 @Getter
 @Setter
+@MappedEntity
 @Table(name = "log_transactions")
 public class LogTransaction {
     @Id
     @BsonId
-    private long id;
+    private Long id;
 
     @NotNull(message = "Transaction is mandatory")
     private Transaction transaction;
