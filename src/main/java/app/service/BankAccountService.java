@@ -25,8 +25,9 @@ public class BankAccountService {
         throw new BankAccountException.BankAccountNotFoundException("Bank Account not found");
     }
 
-    public BankAccount updateBankAccount (BankAccount bankAccount){
-        if(bankAccountRepository.existsById(bankAccount.getId())){
+    public BankAccount updateBankAccount (BankAccount bankAccount, Long id){
+        if(bankAccountRepository.existsById(id)){
+            bankAccount.setId(id);
             return bankAccountRepository.update(bankAccount);
         }
         throw new BankAccountException.BankAccountNotFoundException("Bank Account not found");

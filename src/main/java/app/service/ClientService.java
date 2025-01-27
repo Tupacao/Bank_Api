@@ -25,8 +25,9 @@ public class ClientService {
         throw new ClientException.ClientNotFoundException("Client not found");
     }
 
-    public Client updateClient(Client client) {
-        if (clientRepository.existsById(client.getId())) {
+    public Client updateClient(Client client, Long id) {
+        if (clientRepository.existsById(id)) {
+            client.setId(id);
             return clientRepository.update(client);
         }
         throw new ClientException.ClientNotFoundException("Client not found");
