@@ -26,7 +26,7 @@ public class LogTransactionController {
     private LogTransactionService logTransactionService;
 
     @Get("/{id}")
-    public HttpResponse<LogTransaction> getLogTransaction(@PathVariable Long id) {
+    public HttpResponse<LogTransaction> getLogTransaction(@PathVariable String id) {
         return HttpResponse.ok(logTransactionService.getLogTransaction(id));
     }
 
@@ -41,12 +41,12 @@ public class LogTransactionController {
     }
 
     @Put("/{id}")
-    public HttpResponse<LogTransaction> updateLogTransaction(@Body @Valid LogTransaction logTransaction, @PathVariable Long id) {
+    public HttpResponse<LogTransaction> updateLogTransaction(@Body @Valid LogTransaction logTransaction, @PathVariable String id) {
         return HttpResponse.ok(logTransactionService.updateLogTransaction(logTransaction, id));
     }
 
     @Delete("/{id}")
-    public HttpResponse<?> deleteLogTransaction(@PathVariable Long id) {
+    public HttpResponse<?> deleteLogTransaction(@PathVariable String id) {
         logTransactionService.deleteLogTransaction(id);
         return HttpResponse.noContent();
     }

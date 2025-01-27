@@ -1,6 +1,6 @@
 package app.service;
 
-import app.exception.LogTransactionException;
+import app.exception.TransactionException;
 import app.model.Transaction;
 import app.repository.TransactionRepository;
 import jakarta.inject.Inject;
@@ -22,7 +22,7 @@ public class TransactionService {
         if(transactionRepository.existsById(id)){
             transactionRepository.deleteById(id);
         }
-        throw new LogTransactionException.LogTransactionNotFoundException("Transaction not found");
+        throw new TransactionException.TransactionNotFoundException("Transaction not found");
     }
 
     public Transaction updateTransaction (Transaction transaction, Long id){
@@ -30,11 +30,11 @@ public class TransactionService {
             transaction.setId(id);
             return transactionRepository.update(transaction);
         }
-        throw new LogTransactionException.LogTransactionNotFoundException("Transaction not found");
+        throw new TransactionException.TransactionNotFoundException("Transaction not found");
     }
 
     public Transaction getTransaction (Long id){
-        return transactionRepository.findById(id).orElseThrow(() -> new LogTransactionException.LogTransactionNotFoundException("Transaction not found"));
+        return transactionRepository.findById(id).orElseThrow(() -> new TransactionException.TransactionNotFoundException("Transaction not found"));
     }
 
     public List<Transaction> getAllTransactions (){

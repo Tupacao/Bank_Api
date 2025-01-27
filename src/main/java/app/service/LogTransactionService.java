@@ -18,14 +18,14 @@ public class LogTransactionService {
         return logTransactionRepository.save(logTransaction);
     }
 
-    public void deleteLogTransaction (Long id){
+    public void deleteLogTransaction (String id){
         if(logTransactionRepository.existsById(id)){
             logTransactionRepository.deleteById(id);
         }
         throw new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found");
     }
 
-    public LogTransaction updateLogTransaction (LogTransaction logTransaction, Long id){
+    public LogTransaction updateLogTransaction (LogTransaction logTransaction, String id){
         if(logTransactionRepository.existsById(id)){
             logTransaction.setId(id);
             return logTransactionRepository.update(logTransaction);
@@ -33,7 +33,7 @@ public class LogTransactionService {
         throw new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found");
     }
 
-    public LogTransaction getLogTransaction (Long id){
+    public LogTransaction getLogTransaction (String id){
         return logTransactionRepository.findById(id).orElseThrow(() -> new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found"));
     }
 
