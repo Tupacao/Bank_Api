@@ -2,12 +2,8 @@ package app.model;
 
 import io.micronaut.data.annotation.MappedEntity;
 
-import io.micronaut.serde.annotation.Serdeable;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Getter;
@@ -16,6 +12,7 @@ import lombok.Setter;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Getter
@@ -33,8 +30,18 @@ public class LogTransaction {
     @Enumerated(EnumType.STRING)
     private LogStatus logStatus;
 
+    @NotNull(message = "Origin Account is mandatory")
+    private Long originAccountId;
+
+    @NotNull(message = "Destination Account is mandatory")
+    private Long destinationAccountId;
+
     @NotNull(message = "Transaction is mandatory")
-    private Transaction transaction;
+    private Long transactionId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @NotNull(message = "Date is mandatory")
+    private Date date;
 
     private enum LogStatus {
         SUCCESS,
