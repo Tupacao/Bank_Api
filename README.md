@@ -7,7 +7,8 @@ Este projeto é um sistema backend para gerenciar contas bancárias, permitindo 
 As principais entidades do sistema são:
 - **Cliente:** Contém ID, nome, e-mail, senha.
 - **Conta Bancária:** Contém ID, número da conta, saldo, tipo de conta (ex: CORRENTE, POUPANÇA).
-- **Transação:** Relaciona Contas Bancárias, contendo tipo (DEPÓSITO, SAQUE, TRANSFERÊNCIA), valor, data e status (ex: COMPLETA, PENDENTE).
+- **Transação:** Relaciona Contas Bancárias, contendo tipo (DEPÓSITO, SAQUE, TRANSFERÊNCIA), valor, data e status (ex: COMPLETA, PENDENTE, FALHA).
+- **Log de Auditoria:** Registra detalhes de transações, como ID, tipo, valor, data, status e contas envolvidas.
 
 #### Relações
 - Um Cliente pode ter múltiplas Contas Bancárias.
@@ -80,6 +81,13 @@ As principais entidades do sistema são:
 - `PUT /contas/{id}`: Atualizar os dados de uma conta.
 - `DELETE /contas/{id}`: Remover uma conta.
 
+### Logs de Auditoria
+- `GET /logs`: Obter todos os logs de auditoria.
+- `GET /logs/{id}`: Buscar um log de auditoria pelo ID.
+- `POST /logs`: Criar um novo log de auditoria.
+- `PUT /logs/{id}`: Atualizar um log de auditoria.
+- `DELETE /logs/{id}`: Remover um log de auditoria.
+
 ## Como Executar o Projeto
 
 ### Pré-requisitos
@@ -96,15 +104,15 @@ src/
 ├── main/
 │   ├── java/
 │   │   ├── app/
+│   │   │   ├── config/
 │   │   │   ├── controller/
-│   │   │   ├── service/
+│   │   │   ├── exception/
+│   │   │   ├── handler/
 │   │   │   ├── model/
-│   │   │   ├── protobuf/
-│   │   │   ├── kafka/
-│   │   │      ├── consumer/
-│   │   │      ├── producer/
-|   |   |   ├── repository/
-|   |   |   ├── mapper/
+│   │   │   ├── repository/
+│   │   │   ├── service/
+│   │   │   ├── Application.java
+│   │   ├── proto/
 │   │   ├── resources/
 │   │       ├── application.yml
 ├── test/

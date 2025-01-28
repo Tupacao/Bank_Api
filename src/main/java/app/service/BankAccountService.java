@@ -14,29 +14,31 @@ public class BankAccountService {
     @Inject
     private BankAccountRepository bankAccountRepository;
 
-    public BankAccount createBankAccount (BankAccount bankAccount){
+    public BankAccount createBankAccount(BankAccount bankAccount) {
         return bankAccountRepository.save(bankAccount);
     }
 
-    public void deleteBankAccount (Long id){
-        if(bankAccountRepository.existsById(id)){
+    public void deleteBankAccount(Long id) {
+        if (bankAccountRepository.existsById(id)) {
             bankAccountRepository.deleteById(id);
+        } else {
+            throw new BankAccountException.BankAccountNotFoundException("Bank Account not found");
         }
-        throw new BankAccountException.BankAccountNotFoundException("Bank Account not found");
     }
 
-    public BankAccount updateBankAccount (BankAccount bankAccount){
-        if(bankAccountRepository.existsById(bankAccount.getId())){
+    public BankAccount updateBankAccount(BankAccount bankAccount, Long id) {
+        if (bankAccountRepository.existsById(id)) {
+            bankAccount.setId(id);
             return bankAccountRepository.update(bankAccount);
         }
         throw new BankAccountException.BankAccountNotFoundException("Bank Account not found");
     }
 
-    public BankAccount getBankAccount (Long id){
+    public BankAccount getBankAccount(Long id) {
         return bankAccountRepository.findById(id).orElseThrow(() -> new BankAccountException.BankAccountNotFoundException("Bank Account not found"));
     }
 
-    public List<BankAccount> getAllBankAccounts (){
+    public List<BankAccount> getAllBankAccounts() {
         return bankAccountRepository.findAll();
     }
 }

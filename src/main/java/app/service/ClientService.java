@@ -21,22 +21,21 @@ public class ClientService {
     public void deleteClient(Long id) {
         if (clientRepository.existsById(id)) {
             clientRepository.deleteById(id);
+        } else {
+            throw new ClientException.ClientNotFoundException("Client not found");
         }
-        throw new ClientException.ClientNotFoundException("Client not found");
     }
 
-    public Client updateClient(Client client) {
-        if (clientRepository.existsById(client.getId())) {
+    public Client updateClient(Client client, Long id) {
+        if (clientRepository.existsById(id)) {
+            client.setId(id);
             return clientRepository.update(client);
         }
         throw new ClientException.ClientNotFoundException("Client not found");
     }
 
     public Client getClient(Long id) {
-        if (clientRepository.existsById(id)) {
-            return clientRepository.findById(id).orElse(null);
-        }
-        throw new ClientException.ClientNotFoundException("Client not found");
+        return clientRepository.findById(id).orElseThrow(() -> new ClientException.ClientNotFoundException("Client not found"));
     }
 
     public List<Client> getAllClients() {

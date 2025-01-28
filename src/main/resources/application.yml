@@ -29,10 +29,3 @@ jpa:
         hbm2ddl.auto: update
         show_sql: true
         format_sql: true
-
-kafka:
-  consumer:
-    group-id: consumer-group
-  consumer-config:
-    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-    value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer

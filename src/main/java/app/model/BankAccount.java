@@ -1,5 +1,8 @@
 package app.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Id;
@@ -23,6 +26,7 @@ import lombok.Setter;
 public class BankAccount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
 
     @NotNull(message = "Account number is mandatory")
@@ -36,6 +40,7 @@ public class BankAccount {
     private AccountType accountType;
 
     @ManyToOne
+    @JsonIgnore
     private Client client;
 
     private enum AccountType {

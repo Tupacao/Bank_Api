@@ -14,29 +14,32 @@ public class LogTransactionService {
     @Inject
     private LogTransactionRepository logTransactionRepository;
 
-    public LogTransaction createLogTransaction (LogTransaction logTransaction){
+    public LogTransaction createLogTransaction(LogTransaction logTransaction) {
         return logTransactionRepository.save(logTransaction);
     }
 
-    public void deleteLogTransaction (Long id){
-        if(logTransactionRepository.existsById(id)){
+    public void deleteLogTransaction(String id) {
+        if (logTransactionRepository.existsById(id)) {
             logTransactionRepository.deleteById(id);
+        } else {
+            throw new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found");
+
         }
-        throw new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found");
     }
 
-    public LogTransaction updateLogTransaction (LogTransaction logTransaction){
-        if(logTransactionRepository.existsById(logTransaction.getId())){
+    public LogTransaction updateLogTransaction(LogTransaction logTransaction, String id) {
+        if (logTransactionRepository.existsById(id)) {
+            logTransaction.setId(id);
             return logTransactionRepository.update(logTransaction);
         }
         throw new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found");
     }
 
-    public LogTransaction getLogTransaction (Long id){
+    public LogTransaction getLogTransaction(String id) {
         return logTransactionRepository.findById(id).orElseThrow(() -> new LogTransactionException.LogTransactionNotFoundException("Log Transaction not found"));
     }
 
-    public List<LogTransaction> getAllLogTransactions (){
+    public List<LogTransaction> getAllLogTransactions() {
         return logTransactionRepository.findAll();
     }
 }

@@ -2,32 +2,46 @@ package app.model;
 
 import io.micronaut.data.annotation.MappedEntity;
 
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 
+import java.util.Date;
+import java.util.UUID;
+
 @Getter
 @Setter
+@NoArgsConstructor
 @MappedEntity
 @Table(name = "log_transactions")
 public class LogTransaction {
     @Id
     @BsonId
-    private Long id;
-
-    @NotNull(message = "Transaction is mandatory")
-    private Transaction transaction;
+    @Schema(accessMode = Schema.AccessMode.READ_ONLY)
+    private String id = UUID.randomUUID().toString();
 
     @NotNull(message = "Log Status is mandatory")
     @Enumerated(EnumType.STRING)
     private LogStatus logStatus;
+
+    @NotNull(message = "Origin Account is mandatory")
+    private Long originAccountId;
+
+    @NotNull(message = "Destination Account is mandatory")
+    private Long destinationAccountId;
+
+    @NotNull(message = "Transaction is mandatory")
+    private Long transactionId;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @NotNull(message = "Date is mandatory")
+    private Date date;
 
     private enum LogStatus {
         SUCCESS,
