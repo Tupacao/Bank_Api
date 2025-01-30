@@ -3,6 +3,7 @@ package app.service;
 import app.exception.BankAccountException;
 import app.model.BankAccount;
 import app.repository.BankAccountRepository;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -40,5 +41,9 @@ public class BankAccountService {
 
     public List<BankAccount> getAllBankAccounts() {
         return bankAccountRepository.findAll();
+    }
+
+    public List<BankAccount> getClientBankAccounts(Long clientId) {
+        return bankAccountRepository.findByClientId(clientId);
     }
 }

@@ -1,13 +1,16 @@
 package app.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import jakarta.persistence.Id;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.FetchType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -38,8 +41,8 @@ public class Client {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
-    @JsonIgnore
+    @JsonManagedReference
     private List<BankAccount> bank_accounts;
 }

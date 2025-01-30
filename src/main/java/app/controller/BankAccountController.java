@@ -8,7 +8,6 @@ import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.PathVariable;
 import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Post;
 import io.micronaut.http.annotation.Put;
 import io.micronaut.http.annotation.Delete;
 
@@ -34,11 +33,6 @@ public class BankAccountController {
     @Get("/all")
     public HttpResponse<List<BankAccount>> getAllBankAccounts() {
         return HttpResponse.ok(bankAccountService.getAllBankAccounts());
-    }
-
-    @Post("/")
-    public HttpResponse<BankAccount> createBankAccount(@Body @Valid BankAccount bankAccount) {
-        return HttpResponse.created(bankAccountService.createBankAccount(bankAccount));
     }
 
     @Put("/{id}")
