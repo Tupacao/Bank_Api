@@ -20,17 +20,11 @@ public class LogTransactionService {
     private TransactionService transactionService;
 
     public Transaction createLogTransaction(TransactionDTO transactionDTO, Long id) {
-        Date now = new Date();
-
         Transaction transaction = TransactionMapper.INSTANCE.toEntity(transactionDTO);
-        transaction.setDate(now);
+        transaction.setDate( new Date());
         transaction.setTransactionStatus(Status.WAITING);
 
-        Log log = new Log();
-        log.setDate(now);
-        log.setLogStatus(Status.WAITING);
-        log.setOriginAccountId(transactionDTO.getOriginAccount().getId());
-        log.setDestinationAccountId(transactionDTO.getDestinationAccount().getId());
+        Log log = newLog(transaction, Status.WAITING);
 
         transactionService.createTransaction(transaction);
         logService.createLogTransaction(log);
@@ -54,25 +48,51 @@ public class LogTransactionService {
         }
     }
 
+    public void deleteLogTransaction(Transaction transaction, boolean var) {
+        // TODO: cria o log e deleta a transação, isso que o ultimo consumer vai chamar, altere a vontade
+        transactionService.deleteTransaction(transaction.getId());
+        Log log = newLog(transaction, var ? Status.SUCCESS : Status.FAILED);
+        logService.createLogTransaction(log);
+    }
+
     private void withdrawTransaction(Transaction transaction) {
-        Log log = updateLogTransaction(transaction);
-        // TODO: Implementar metodo
+
+        Log log = newLog(transaction, Status.PENDING);
+        logService.createLogTransaction(log);
+
+        transaction.setTransactionStatus(Status.PENDING);
+        // TODO: Implementar metodo eu
+
+        // TODO: Usa o kafka pra mandar se deu sucesso ou falha
     }
 
     private void depositTransaction(Transaction transaction) {
-        Log log = updateLogTransaction(transaction);
-        // TODO: Implementar metodo
+
+        Log log =  newLog(transaction, Status.PENDING);
+        logService.createLogTransaction(log);
+
+        transaction.setTransactionStatus(Status.PENDING);
+        // TODO: Implementar metodo eu
+
+        // TODO: Usa o kafka pra mandar se deu sucesso ou falha
     }
 
     private void transferTransaction(Transaction transaction) {
-        Log log = updateLogTransaction(transaction);
-        // TODO: Implementar metodo
+
+        Log log =  newLog(transaction, Status.PENDING);
+        logService.createLogTransaction(log);
+
+        transaction.setTransactionStatus(Status.PENDING);
+        // TODO: Implementar metodo eu
+
+        // TODO: Usa o kafka pra mandar se deu sucesso ou falha
+
     }
 
-    private Log updateLogTransaction(Transaction transaction) {
+    private Log newLog(Transaction transaction, Status status) {
         Log log = new Log();
         log.setDate(new Date());
-        log.setLogStatus(Status.PENDING);
+        log.setLogStatus(status);
         log.setOriginAccountId(transaction.getOriginAccount().getId());
         log.setDestinationAccountId(transaction.getDestinationAccount().getId());
         return log;
