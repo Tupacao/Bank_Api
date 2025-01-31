@@ -1,5 +1,7 @@
 package app.model;
 
+import app.shared.Status;
+import app.shared.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -43,25 +45,12 @@ public class Transaction {
 
     @NotNull(message = "Transaction Status is mandatory")
     @Enumerated(EnumType.STRING)
-    private TransactionStatus transactionStatus;
+    private Status transactionStatus;
 
     @NotNull(message = "Origin Bank Account is mandatory")
     @ManyToOne
     private BankAccount originAccount;
 
-    @NotNull(message = "Destination Bank Account is mandatory")
     @ManyToOne
     private BankAccount destinationAccount;
-
-    private enum TransactionType {
-        DEPOSIT,
-        WITHDRAW,
-        TRANSFER
-    }
-
-    private enum TransactionStatus {
-        SUCCESS,
-        PENDING,
-        FAILED
-    }
 }

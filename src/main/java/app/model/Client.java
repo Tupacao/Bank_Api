@@ -41,7 +41,7 @@ public class Client {
     @NotBlank(message = "Password is mandatory")
     private String password;
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "client")
     @Schema(accessMode = Schema.AccessMode.READ_ONLY)
     @JsonManagedReference
     private List<BankAccount> bank_accounts;

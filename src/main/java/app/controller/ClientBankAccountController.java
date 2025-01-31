@@ -1,7 +1,7 @@
 package app.controller;
 
 import app.model.BankAccount;
-import app.service.ClienBankAccountService;
+import app.service.ClientBankAccountService;
 
 import io.micronaut.http.HttpResponse;
 import io.micronaut.http.annotation.Get;
@@ -22,7 +22,7 @@ import java.util.List;
 public class ClientBankAccountController {
 
     @Inject
-    ClienBankAccountService clientBankAccountService;
+    ClientBankAccountService clientBankAccountService;
 
     @Get("/")
     public HttpResponse<List<BankAccount>> getClientBankAccounts(@PathVariable Long clientId) {

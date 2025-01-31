@@ -8,7 +8,7 @@ import jakarta.inject.Singleton;
 import java.util.List;
 
 @Singleton
-public class ClienBankAccountService {
+public class ClientBankAccountService {
 
     @Inject
     private BankAccountService bankAccountService;

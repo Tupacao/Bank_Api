@@ -23,31 +23,31 @@ import java.util.List;
 @Tag(name = "Transaction")
 public class TransactionController {
     @Inject
-    private TransactionService bankAccountService;
+    private TransactionService transactionService;
 
     @Get("/{id}")
     public HttpResponse<Transaction> getTransaction(@PathVariable Long id) {
-        return HttpResponse.ok(bankAccountService.getTransaction(id));
+        return HttpResponse.ok(transactionService.getTransaction(id));
     }
 
     @Get("/all")
     public HttpResponse<List<Transaction>> getAllTransactions() {
-        return HttpResponse.ok(bankAccountService.getAllTransactions());
+        return HttpResponse.ok(transactionService.getAllTransactions());
     }
 
     @Post("/")
     public HttpResponse<Transaction> createTransaction(@Body @Valid Transaction transaction) {
-        return HttpResponse.created(bankAccountService.createTransaction(transaction));
+        return HttpResponse.created(transactionService.createTransaction(transaction));
     }
 
     @Put("/{id}")
     public HttpResponse<Transaction> updateTransaction(@Body @Valid Transaction transaction, @PathVariable Long id) {
-        return HttpResponse.ok(bankAccountService.updateTransaction(transaction, id));
+        return HttpResponse.ok(transactionService.updateTransaction(transaction, id));
     }
 
     @Delete("/{id}")
     public HttpResponse<?> deleteTransaction(@PathVariable Long id) {
-        bankAccountService.deleteTransaction(id);
+        transactionService.deleteTransaction(id);
         return HttpResponse.noContent();
     }
 }
