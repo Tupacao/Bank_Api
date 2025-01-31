@@ -1,6 +1,7 @@
 package app.repository;
 
 import app.model.Transaction;
+
 import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.jpa.repository.JpaRepository;
 

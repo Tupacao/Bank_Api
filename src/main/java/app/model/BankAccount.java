@@ -1,17 +1,10 @@
 package app.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.EnumType;
-import jakarta.validation.constraints.NotBlank;
+
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import lombok.Getter;
@@ -35,12 +28,12 @@ public class BankAccount {
     @NotNull(message = "Balance is mandatory")
     private double balance;
 
-    @NotBlank(message = "Account Type is mandatory")
+    @NotNull(message = "Account Type is mandatory")
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
     @ManyToOne
-    @JsonIgnore
+    @JsonBackReference
     private Client client;
 
     private enum AccountType {
