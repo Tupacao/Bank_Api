@@ -1,6 +1,7 @@
 package app.model;
 
 import app.shared.Status;
+import app.shared.TransactionType;
 import io.micronaut.data.annotation.MappedEntity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -34,6 +35,10 @@ public class Log {
     @NotNull(message = "Log Status is mandatory")
     @Enumerated(EnumType.STRING)
     private Status logStatus;
+
+    @NotNull(message = "Log Type is mandatory")
+    @Enumerated(EnumType.STRING)
+    private TransactionType logTypeTransaction;
 
     @NotNull(message = "Origin Account is mandatory")
     private Long originAccountId;

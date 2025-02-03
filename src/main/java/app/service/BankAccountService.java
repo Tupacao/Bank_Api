@@ -39,6 +39,26 @@ public class BankAccountService {
         return bankAccountRepository.findById(id).orElseThrow(() -> new BankAccountException.BankAccountNotFoundException("Bank Account not found"));
     }
 
+    public void withdraw(BankAccount bankAccount, double amount) {
+        bankAccount.setBalance(bankAccount.getBalance() - amount);
+        bankAccountRepository.update(bankAccount);
+    }
+
+    public void deposit(Long id, double amount) {
+        BankAccount bankAccount = getBankAccount(id);
+        bankAccount.setBalance(bankAccount.getBalance() + amount);
+        bankAccountRepository.update(bankAccount);
+    }
+
+    public void transfer(Long id_origin, Long id_destination, double amount) {
+        BankAccount origin = getBankAccount(id_origin);
+        BankAccount destination = getBankAccount(id_destination);
+        origin.setBalance(origin.getBalance() - amount);
+        destination.setBalance(destination.getBalance() + amount);
+        bankAccountRepository.update(origin);
+        bankAccountRepository.update(destination);
+    }
+
     public List<BankAccount> getAllBankAccounts() {
         return bankAccountRepository.findAll();
     }

@@ -19,15 +19,17 @@ public class LogTransactionService {
     @Inject
     private TransactionService transactionService;
 
+    @Inject
+    private BankAccountService bankAccountService;
+
     public Transaction createLogTransaction(TransactionDTO transactionDTO, Long id) {
         Transaction transaction = TransactionMapper.INSTANCE.toEntity(transactionDTO);
         transaction.setDate( new Date());
         transaction.setTransactionStatus(Status.WAITING);
 
-        Log log = newLog(transaction, Status.WAITING);
+        publishLog(transaction, Status.WAITING);
 
         transactionService.createTransaction(transaction);
-        logService.createLogTransaction(log);
 
         // TODO: Fazer a parte de send kafka bem aqui, ai em cima ele tá criando a transação,o log e salvando no bd
 
@@ -51,50 +53,67 @@ public class LogTransactionService {
     public void deleteLogTransaction(Transaction transaction, boolean var) {
         // TODO: cria o log e deleta a transação, isso que o ultimo consumer vai chamar, altere a vontade
         transactionService.deleteTransaction(transaction.getId());
-        Log log = newLog(transaction, var ? Status.SUCCESS : Status.FAILED);
-        logService.createLogTransaction(log);
+        publishLog(transaction, var ? Status.SUCCESS : Status.FAILED);
     }
 
     private void withdrawTransaction(Transaction transaction) {
-
-        Log log = newLog(transaction, Status.PENDING);
-        logService.createLogTransaction(log);
+        publishLog(transaction, Status.PENDING);
 
         transaction.setTransactionStatus(Status.PENDING);
-        // TODO: Implementar metodo eu
+
+        double amount = transaction.getAmount();
+
+        if(transaction.getOriginAccount().getBalance() >= amount) {
+            bankAccountService.withdraw(transaction.getOriginAccount(), amount);
+            transaction.setTransactionStatus(Status.SUCCESS);
+            transactionService.updateTransaction(transaction, transaction.getId());
+        } else {
+            transaction.setTransactionStatus(Status.FAILED);
+        }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
     }
 
     private void depositTransaction(Transaction transaction) {
-
-        Log log =  newLog(transaction, Status.PENDING);
-        logService.createLogTransaction(log);
+        publishLog(transaction, Status.PENDING);
 
         transaction.setTransactionStatus(Status.PENDING);
-        // TODO: Implementar metodo eu
+
+        double amount = transaction.getAmount();
+
+        bankAccountService.deposit(transaction.getDestinationAccount().getId(), amount);
+        transaction.setTransactionStatus(Status.SUCCESS);
+        transactionService.updateTransaction(transaction, transaction.getId());
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
     }
 
     private void transferTransaction(Transaction transaction) {
-
-        Log log =  newLog(transaction, Status.PENDING);
-        logService.createLogTransaction(log);
+        publishLog(transaction, Status.PENDING);
 
         transaction.setTransactionStatus(Status.PENDING);
-        // TODO: Implementar metodo eu
+
+        double amount = transaction.getAmount();
+
+        if(transaction.getOriginAccount().getBalance() >= amount) {
+            bankAccountService.transfer(transaction.getOriginAccount().getId(), transaction.getDestinationAccount().getId(), amount);
+            transaction.setTransactionStatus(Status.SUCCESS);
+            transactionService.updateTransaction(transaction, transaction.getId());
+        } else {
+            transaction.setTransactionStatus(Status.FAILED);
+        }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
 
     }
 
-    private Log newLog(Transaction transaction, Status status) {
+    private void publishLog(Transaction transaction, Status status) {
         Log log = new Log();
         log.setDate(new Date());
         log.setLogStatus(status);
         log.setOriginAccountId(transaction.getOriginAccount().getId());
         log.setDestinationAccountId(transaction.getDestinationAccount().getId());
-        return log;
+        log.setLogTypeTransaction(transaction.getTransactionType());
+        logService.createLogTransaction(log);
     }
 }
