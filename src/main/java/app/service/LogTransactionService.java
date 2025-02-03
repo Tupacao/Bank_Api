@@ -2,6 +2,8 @@ package app.service;
 
 import app.dto.mapper.TransactionMapper;
 import app.dto.request.TransactionDTO;
+import app.exception.BankAccountException;
+import app.exception.TransactionException;
 import app.model.Log;
 import app.model.Transaction;
 import app.shared.Status;
@@ -60,9 +62,11 @@ public class LogTransactionService {
     private void withdrawTransaction(Transaction transaction) {
         publishLog(transaction, Status.PENDING);
 
-        transaction.setTransactionStatus(Status.PENDING);
+        if(transaction.getOriginAccount() != transaction.getDestinationAccount()){
+            throw new TransactionException.AccountException("Origin and destination account must be the same");
+        }
 
-        // TODO: validação para ver se a conta de origem e destino são iguais
+        transaction.setTransactionStatus(Status.PENDING);
 
         double amount = transaction.getAmount();
 
@@ -71,10 +75,7 @@ public class LogTransactionService {
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
         } else {
-            publishLog(transaction, Status.FAILED);
-            transaction.setTransactionStatus(Status.FAILED);
-            transactionService.updateTransaction(transaction, transaction.getId());
-            // TODO: erro de saldo insuficiente implementar
+            errorTransaction(transaction);
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
@@ -83,9 +84,11 @@ public class LogTransactionService {
     private void depositTransaction(Transaction transaction) {
         publishLog(transaction, Status.PENDING);
 
-        transaction.setTransactionStatus(Status.PENDING);
+        if(transaction.getOriginAccount() != transaction.getDestinationAccount()){
+            throw new TransactionException.AccountException("Origin and destination account must be the same");
+        }
 
-        // TODO: validação para ver se a conta de origem e destino são iguais
+        transaction.setTransactionStatus(Status.PENDING);
 
         double amount = transaction.getAmount();
 
@@ -99,9 +102,11 @@ public class LogTransactionService {
     private void transferTransaction(Transaction transaction) {
         publishLog(transaction, Status.PENDING);
 
-        transaction.setTransactionStatus(Status.PENDING);
+        if(transaction.getOriginAccount() == transaction.getDestinationAccount()){
+            throw new TransactionException.AccountException("Origin and destination account must be different");
+        }
 
-        // TODO: validação para ver se a conta de origem e destino são diferentes
+        transaction.setTransactionStatus(Status.PENDING);
 
         double amount = transaction.getAmount();
 
@@ -110,10 +115,7 @@ public class LogTransactionService {
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
         } else {
-            publishLog(transaction, Status.FAILED);
-            transaction.setTransactionStatus(Status.FAILED);
-            transactionService.updateTransaction(transaction, transaction.getId());
-            // TODO: erro de saldo insuficiente implementar
+            errorTransaction(transaction);
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
@@ -127,5 +129,12 @@ public class LogTransactionService {
         log.setDestinationAccountId(transaction.getDestinationAccount().getId());
         log.setLogTypeTransaction(transaction.getTransactionType());
         logService.createLogTransaction(log);
+    }
+
+    private void errorTransaction(Transaction transaction) {
+        publishLog(transaction, Status.FAILED);
+        transaction.setTransactionStatus(Status.FAILED);
+        transactionService.updateTransaction(transaction, transaction.getId());
+        throw new BankAccountException.InsufficientFundsException("Insufficient funds");
     }
 }

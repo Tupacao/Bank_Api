@@ -18,4 +18,12 @@ public class TransactionHandler {
             return HttpResponse.notFound(exception.getMessage());
         }
     }
+
+    @Singleton
+    public static class OriginDestinationAccountHandler implements ExceptionHandler<TransactionException.AccountException, HttpResponse<?>> {
+        @Override
+        public HttpResponse<?> handle(HttpRequest request, TransactionException.AccountException exception) {
+            return HttpResponse.badRequest(exception.getMessage());
+        }
+    }
 }

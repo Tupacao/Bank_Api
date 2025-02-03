@@ -10,10 +10,19 @@ import jakarta.inject.Singleton;
 @Produces(io.micronaut.http.MediaType.APPLICATION_JSON)
 @Singleton
 public class BankAccountHandler {
+
     @Singleton
     public static class BankAccountNotFoundHandler implements ExceptionHandler<BankAccountException.BankAccountNotFoundException, HttpResponse<?>> {
         @Override
         public HttpResponse<?> handle(HttpRequest request, BankAccountException.BankAccountNotFoundException exception) {
+            return HttpResponse.notFound(exception.getMessage());
+        }
+    }
+
+    @Singleton
+    public static class InsufficientFundsHandler implements ExceptionHandler<BankAccountException.InsufficientFundsException, HttpResponse<?>> {
+        @Override
+        public HttpResponse<?> handle(HttpRequest request, BankAccountException.InsufficientFundsException exception) {
             return HttpResponse.notFound(exception.getMessage());
         }
     }

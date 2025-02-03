@@ -6,4 +6,10 @@ public class BankAccountException {
             super(message);
         }
     }
+
+    public static class InsufficientFundsException extends RuntimeException {
+        public InsufficientFundsException(String message) {
+            super(message);
+        }
+    }
 }

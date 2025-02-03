@@ -6,4 +6,10 @@ public class TransactionException {
             super(message);
         }
     }
+
+    public static class AccountException extends RuntimeException {
+        public AccountException(String message) {
+            super(message);
+        }
+    }
 }
