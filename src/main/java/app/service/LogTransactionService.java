@@ -5,6 +5,7 @@ import app.dto.request.TransactionDTO;
 import app.model.Log;
 import app.model.Transaction;
 import app.shared.Status;
+
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -61,6 +62,8 @@ public class LogTransactionService {
 
         transaction.setTransactionStatus(Status.PENDING);
 
+        // TODO: validação para ver se a conta de origem e destino são iguais
+
         double amount = transaction.getAmount();
 
         if(transaction.getOriginAccount().getBalance() >= amount) {
@@ -68,7 +71,10 @@ public class LogTransactionService {
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
         } else {
+            publishLog(transaction, Status.FAILED);
             transaction.setTransactionStatus(Status.FAILED);
+            transactionService.updateTransaction(transaction, transaction.getId());
+            // TODO: erro de saldo insuficiente implementar
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
@@ -79,9 +85,11 @@ public class LogTransactionService {
 
         transaction.setTransactionStatus(Status.PENDING);
 
+        // TODO: validação para ver se a conta de origem e destino são iguais
+
         double amount = transaction.getAmount();
 
-        bankAccountService.deposit(transaction.getDestinationAccount().getId(), amount);
+        bankAccountService.deposit(transaction.getDestinationAccount(), amount);
         transaction.setTransactionStatus(Status.SUCCESS);
         transactionService.updateTransaction(transaction, transaction.getId());
 
@@ -93,18 +101,22 @@ public class LogTransactionService {
 
         transaction.setTransactionStatus(Status.PENDING);
 
+        // TODO: validação para ver se a conta de origem e destino são diferentes
+
         double amount = transaction.getAmount();
 
         if(transaction.getOriginAccount().getBalance() >= amount) {
-            bankAccountService.transfer(transaction.getOriginAccount().getId(), transaction.getDestinationAccount().getId(), amount);
+            bankAccountService.transfer(transaction.getOriginAccount(), transaction.getDestinationAccount(), amount);
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
         } else {
+            publishLog(transaction, Status.FAILED);
             transaction.setTransactionStatus(Status.FAILED);
+            transactionService.updateTransaction(transaction, transaction.getId());
+            // TODO: erro de saldo insuficiente implementar
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
-
     }
 
     private void publishLog(Transaction transaction, Status status) {

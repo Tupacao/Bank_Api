@@ -44,15 +44,12 @@ public class BankAccountService {
         bankAccountRepository.update(bankAccount);
     }
 
-    public void deposit(Long id, double amount) {
-        BankAccount bankAccount = getBankAccount(id);
+    public void deposit(BankAccount bankAccount, double amount) {
         bankAccount.setBalance(bankAccount.getBalance() + amount);
         bankAccountRepository.update(bankAccount);
     }
 
-    public void transfer(Long id_origin, Long id_destination, double amount) {
-        BankAccount origin = getBankAccount(id_origin);
-        BankAccount destination = getBankAccount(id_destination);
+    public void transfer(BankAccount origin, BankAccount destination, double amount) {
         origin.setBalance(origin.getBalance() - amount);
         destination.setBalance(destination.getBalance() + amount);
         bankAccountRepository.update(origin);
