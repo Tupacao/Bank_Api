@@ -74,7 +74,7 @@ public class LogTransactionService {
         publishLog(transaction, Status.PENDING);
 
         if (transaction.getOriginAccount().getId() != transaction.getDestinationAccount().getId()) {
-            return "Transferência não realizada";
+            return errorTransaction(transaction, "Origin and destination account must be the same");
 //            throw new TransactionException.AccountException("Origin and destination account must be the same");
         }
 
@@ -88,8 +88,7 @@ public class LogTransactionService {
             transactionService.updateTransaction(transaction, transaction.getId());
             return "Transferência realizada com sucesso";
         } else {
-            return "Transferência não realizada";
-//            errorTransaction(transaction);
+            return errorTransaction(transaction, "Insufficient funds");
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha (String)
@@ -99,7 +98,7 @@ public class LogTransactionService {
         publishLog(transaction, Status.PENDING);
 
         if (transaction.getOriginAccount().getId() != transaction.getDestinationAccount().getId()) {
-            return "Transferência não realizada";
+            return errorTransaction(transaction, "Origin and destination account must be the same");
 //            throw new TransactionException.AccountException("Origin and destination account must be the same");
         }
 
@@ -111,14 +110,13 @@ public class LogTransactionService {
         transaction.setTransactionStatus(Status.SUCCESS);
         transactionService.updateTransaction(transaction, transaction.getId());
         return "Transferência realizada com sucesso";
-        // TODO: Usa o kafka pra mandar se deu sucesso ou falha
     }
 
     private String transferTransaction(Transaction transaction) {
         publishLog(transaction, Status.PENDING);
 
         if (transaction.getOriginAccount().getId() == transaction.getDestinationAccount().getId()) {
-            return "Transferência não realizada";
+            return errorTransaction(transaction, "Origin and destination account must be different");
 //            throw new TransactionException.AccountException("Origin and destination account must be different");
         }
 
@@ -132,12 +130,8 @@ public class LogTransactionService {
             transactionService.updateTransaction(transaction, transaction.getId());
             return "Transferência realizada com sucesso";
         } else {
-            return "Transferência não realizada";
-//            errorTransaction(transaction);
+            return errorTransaction(transaction, "Insufficient funds");
         }
-
-        // TODO: Usa o kafka pra mandar se deu sucesso ou falha
-
     }
 
     private void publishLog(Transaction transaction, Status status) {
@@ -150,11 +144,12 @@ public class LogTransactionService {
         logService.createLogTransaction(log);
     }
 
-    private void errorTransaction(Transaction transaction) {
+    private String errorTransaction(Transaction transaction, String message) {
         publishLog(transaction, Status.FAILED);
         transaction.setTransactionStatus(Status.FAILED);
         transactionService.updateTransaction(transaction, transaction.getId());
         deleteLogTransaction(transaction, false);
-        throw new BankAccountException.InsufficientFundsException("Insufficient funds");
+//        throw new BankAccountException.InsufficientFundsException("Insufficient funds");
+        return message;
     }
 }
