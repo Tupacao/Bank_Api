@@ -30,75 +30,77 @@ public class LogTransactionService {
     @Inject
     private BankAccountService bankAccountService;
 
-    public Transaction createLogTransaction(TransactionDTO transactionDTO, Long id) {
+    public Transaction createLogTransaction(TransactionDTO transactionDTO, Long origin_id, Long destination_id) {
         Transaction transaction = TransactionMapper.INSTANCE.toEntity(transactionDTO);
-        transaction.setDate( new Date());
+        transaction.setDate(new Date());
         transaction.setTransactionStatus(Status.WAITING);
+        transaction.setOriginAccount(bankAccountService.getBankAccount(origin_id));
+        transaction.setDestinationAccount(bankAccountService.getBankAccount(destination_id));
 
         publishLog(transaction, Status.WAITING);
 
-        transactionService.createTransaction(transaction);
-        logService.createLogTransaction(log);
+        transaction = transactionService.createTransaction(transaction);
 
-        // TODO: Fazer a parte de send kafka bem aqui, ai em cima ele tá criando a transação,o log e salvando no bd
-        TransactionProto.Transaction.Builder transactionBuilder = TransactionProto.Transaction.newBuilder();
-        transactionBuilder.setTransactionId(transaction.getId());
-        TransactionProto.Transaction transactionProto = transactionBuilder.build();
-
-        transactionProducerService.sendTransaction(String.valueOf(transaction.getTransactionStatus()), transactionProto);
+        try {
+            processTransaction(transaction);
+        } catch (Exception e) {
+            deleteLogTransaction(transaction, false);
+        }
+//
+//        TransactionProto.Transaction transactionProto = TransactionProto.Transaction.newBuilder()
+//                .setTransactionId(transaction.getId())
+//                .build();
+//
+//        transactionProducerService.sendTransaction(String.valueOf(transaction.getTransactionStatus()), transactionProto);
 
         return transaction;
     }
 
     public String processTransaction(Transaction transaction) {
-        switch (transaction.getTransactionType()) {
-            case WITHDRAW:
-                withdrawTransaction(transaction);
-                break;
-            case DEPOSIT:
-                depositTransaction(transaction);
-                break;
-            case TRANSFER:
-                transferTransaction(transaction);
-                break;
-        }
-        //tem que retornar alguma string para ser usada no stream e enviar uma mensagem para o segundo topico
-        return "teste";
+        return switch (transaction.getTransactionType()) {
+            case WITHDRAW -> withdrawTransaction(transaction);
+            case DEPOSIT -> depositTransaction(transaction);
+            case TRANSFER -> transferTransaction(transaction);
+            default -> "Transferência não realizada";
+        };
     }
 
     public void deleteLogTransaction(Transaction transaction, boolean var) {
-        // TODO: cria o log e deleta a transação, isso que o ultimo consumer vai chamar, altere a vontade
         transactionService.deleteTransaction(transaction.getId());
         publishLog(transaction, var ? Status.SUCCESS : Status.FAILED);
     }
 
-    private void withdrawTransaction(Transaction transaction) {
+    private String withdrawTransaction(Transaction transaction) {
         publishLog(transaction, Status.PENDING);
 
-        if(transaction.getOriginAccount() != transaction.getDestinationAccount()){
-            throw new TransactionException.AccountException("Origin and destination account must be the same");
+        if (transaction.getOriginAccount().getId() != transaction.getDestinationAccount().getId()) {
+            return "Transferência não realizada";
+//            throw new TransactionException.AccountException("Origin and destination account must be the same");
         }
 
         transaction.setTransactionStatus(Status.PENDING);
 
         double amount = transaction.getAmount();
 
-        if(transaction.getOriginAccount().getBalance() >= amount) {
+        if (transaction.getOriginAccount().getBalance() >= amount) {
             bankAccountService.withdraw(transaction.getOriginAccount(), amount);
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
+            return "Transferência realizada com sucesso";
         } else {
-            errorTransaction(transaction);
+            return "Transferência não realizada";
+//            errorTransaction(transaction);
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha (String)
     }
 
-    private void depositTransaction(Transaction transaction) {
+    private String depositTransaction(Transaction transaction) {
         publishLog(transaction, Status.PENDING);
 
-        if(transaction.getOriginAccount() != transaction.getDestinationAccount()){
-            throw new TransactionException.AccountException("Origin and destination account must be the same");
+        if (transaction.getOriginAccount().getId() != transaction.getDestinationAccount().getId()) {
+            return "Transferência não realizada";
+//            throw new TransactionException.AccountException("Origin and destination account must be the same");
         }
 
         transaction.setTransactionStatus(Status.PENDING);
@@ -108,27 +110,30 @@ public class LogTransactionService {
         bankAccountService.deposit(transaction.getDestinationAccount(), amount);
         transaction.setTransactionStatus(Status.SUCCESS);
         transactionService.updateTransaction(transaction, transaction.getId());
-
+        return "Transferência realizada com sucesso";
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
     }
 
-    private void transferTransaction(Transaction transaction) {
+    private String transferTransaction(Transaction transaction) {
         publishLog(transaction, Status.PENDING);
 
-        if(transaction.getOriginAccount() == transaction.getDestinationAccount()){
-            throw new TransactionException.AccountException("Origin and destination account must be different");
+        if (transaction.getOriginAccount().getId() == transaction.getDestinationAccount().getId()) {
+            return "Transferência não realizada";
+//            throw new TransactionException.AccountException("Origin and destination account must be different");
         }
 
         transaction.setTransactionStatus(Status.PENDING);
 
         double amount = transaction.getAmount();
 
-        if(transaction.getOriginAccount().getBalance() >= amount) {
+        if (transaction.getOriginAccount().getBalance() >= amount) {
             bankAccountService.transfer(transaction.getOriginAccount(), transaction.getDestinationAccount(), amount);
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
+            return "Transferência realizada com sucesso";
         } else {
-            errorTransaction(transaction);
+            return "Transferência não realizada";
+//            errorTransaction(transaction);
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
@@ -149,6 +154,7 @@ public class LogTransactionService {
         publishLog(transaction, Status.FAILED);
         transaction.setTransactionStatus(Status.FAILED);
         transactionService.updateTransaction(transaction, transaction.getId());
+        deleteLogTransaction(transaction, false);
         throw new BankAccountException.InsufficientFundsException("Insufficient funds");
     }
 }

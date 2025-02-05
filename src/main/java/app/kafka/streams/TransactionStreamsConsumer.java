@@ -4,12 +4,16 @@ import app.kafka.config.KafkaStreamsConfig;
 import app.processor.IdempotentProcessor;
 import app.service.LogTransactionService;
 import app.service.TransactionService;
+import app.proto.TransactionProto;
+
 import com.google.protobuf.InvalidProtocolBufferException;
+
 import io.micronaut.configuration.kafka.annotation.KafkaListener;
 import io.micronaut.context.annotation.Context;
+
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
-import app.proto.TransactionProto;
+
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
