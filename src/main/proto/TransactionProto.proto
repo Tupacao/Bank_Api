@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package app.proto;
+
+option java_outer_classname = "TransactionProto";
+
+message Transaction {
+    int64 transaction_id = 1;
+}

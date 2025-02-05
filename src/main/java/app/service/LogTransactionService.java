@@ -2,6 +2,7 @@ package app.service;
 
 import app.dto.mapper.TransactionMapper;
 import app.dto.request.TransactionDTO;
+import app.kafka.producer.TransactionProducerService;
 import app.exception.BankAccountException;
 import app.exception.TransactionException;
 import app.model.Log;
@@ -10,6 +11,7 @@ import app.shared.Status;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import app.proto.TransactionProto;
 
 import java.util.Date;
 
@@ -23,6 +25,9 @@ public class LogTransactionService {
     private TransactionService transactionService;
 
     @Inject
+    private TransactionProducerService transactionProducerService;
+
+    @Inject
     private BankAccountService bankAccountService;
 
     public Transaction createLogTransaction(TransactionDTO transactionDTO, Long id) {
@@ -33,13 +38,19 @@ public class LogTransactionService {
         publishLog(transaction, Status.WAITING);
 
         transactionService.createTransaction(transaction);
+        logService.createLogTransaction(log);
 
         // TODO: Fazer a parte de send kafka bem aqui, ai em cima ele tá criando a transação,o log e salvando no bd
+        TransactionProto.Transaction.Builder transactionBuilder = TransactionProto.Transaction.newBuilder();
+        transactionBuilder.setTransactionId(transaction.getId());
+        TransactionProto.Transaction transactionProto = transactionBuilder.build();
+
+        transactionProducerService.sendTransaction(String.valueOf(transaction.getTransactionStatus()), transactionProto);
 
         return transaction;
     }
 
-    public void processTransaction(Transaction transaction) {
+    public String processTransaction(Transaction transaction) {
         switch (transaction.getTransactionType()) {
             case WITHDRAW:
                 withdrawTransaction(transaction);
@@ -51,6 +62,8 @@ public class LogTransactionService {
                 transferTransaction(transaction);
                 break;
         }
+        //tem que retornar alguma string para ser usada no stream e enviar uma mensagem para o segundo topico
+        return "teste";
     }
 
     public void deleteLogTransaction(Transaction transaction, boolean var) {
@@ -78,7 +91,7 @@ public class LogTransactionService {
             errorTransaction(transaction);
         }
 
-        // TODO: Usa o kafka pra mandar se deu sucesso ou falha
+        // TODO: Usa o kafka pra mandar se deu sucesso ou falha (String)
     }
 
     private void depositTransaction(Transaction transaction) {
@@ -119,6 +132,7 @@ public class LogTransactionService {
         }
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
+
     }
 
     private void publishLog(Transaction transaction, Status status) {
