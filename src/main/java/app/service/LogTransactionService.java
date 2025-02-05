@@ -2,11 +2,13 @@ package app.service;
 
 import app.dto.mapper.TransactionMapper;
 import app.dto.request.TransactionDTO;
+import app.kafka.producer.TransactionProducerService;
 import app.model.Log;
 import app.model.Transaction;
 import app.shared.Status;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import app.proto.TransactionProto;
 
 import java.util.Date;
 
@@ -19,6 +21,9 @@ public class LogTransactionService {
     @Inject
     private TransactionService transactionService;
 
+    @Inject
+    private TransactionProducerService transactionProducerService;
+
     public Transaction createLogTransaction(TransactionDTO transactionDTO, Long id) {
         Transaction transaction = TransactionMapper.INSTANCE.toEntity(transactionDTO);
         transaction.setDate( new Date());
@@ -30,11 +35,16 @@ public class LogTransactionService {
         logService.createLogTransaction(log);
 
         // TODO: Fazer a parte de send kafka bem aqui, ai em cima ele tá criando a transação,o log e salvando no bd
+        TransactionProto.Transaction.Builder transactionBuilder = TransactionProto.Transaction.newBuilder();
+        transactionBuilder.setTransactionId(transaction.getId());
+        TransactionProto.Transaction transactionProto = transactionBuilder.build();
+
+        transactionProducerService.sendTransaction(String.valueOf(transaction.getTransactionStatus()), transactionProto);
 
         return transaction;
     }
 
-    public void processTransaction(Transaction transaction) {
+    public String processTransaction(Transaction transaction) {
         switch (transaction.getTransactionType()) {
             case WITHDRAW:
                 withdrawTransaction(transaction);
@@ -46,6 +56,8 @@ public class LogTransactionService {
                 transferTransaction(transaction);
                 break;
         }
+        //tem que retornar alguma string para ser usada no stream e enviar uma mensagem para o segundo topico
+        return "teste";
     }
 
     public void deleteLogTransaction(Transaction transaction, boolean var) {
@@ -63,7 +75,7 @@ public class LogTransactionService {
         transaction.setTransactionStatus(Status.PENDING);
         // TODO: Implementar metodo eu
 
-        // TODO: Usa o kafka pra mandar se deu sucesso ou falha
+        // TODO: Usa o kafka pra mandar se deu sucesso ou falha (String)
     }
 
     private void depositTransaction(Transaction transaction) {
@@ -86,7 +98,6 @@ public class LogTransactionService {
         // TODO: Implementar metodo eu
 
         // TODO: Usa o kafka pra mandar se deu sucesso ou falha
-
     }
 
     private Log newLog(Transaction transaction, Status status) {
