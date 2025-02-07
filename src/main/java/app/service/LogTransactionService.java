@@ -41,17 +41,11 @@ public class LogTransactionService {
 
         transaction = transactionService.createTransaction(transaction);
 
-        try {
-            processTransaction(transaction);
-        } catch (Exception e) {
-            deleteLogTransaction(transaction, false);
-        }
-//
-//        TransactionProto.Transaction transactionProto = TransactionProto.Transaction.newBuilder()
-//                .setTransactionId(transaction.getId())
-//                .build();
-//
-//        transactionProducerService.sendTransaction(String.valueOf(transaction.getTransactionStatus()), transactionProto);
+        TransactionProto.Transaction transactionProto = TransactionProto.Transaction.newBuilder()
+                .setTransactionId(transaction.getId())
+                .build();
+
+        transactionProducerService.sendTransaction(String.valueOf(transaction.getTransactionStatus()), transactionProto);
 
         return transaction;
     }
@@ -61,7 +55,7 @@ public class LogTransactionService {
             case WITHDRAW -> withdrawTransaction(transaction);
             case DEPOSIT -> depositTransaction(transaction);
             case TRANSFER -> transferTransaction(transaction);
-            default -> "Transferência não realizada";
+            default -> "Unexpected error in transaction";
         };
     }
 
@@ -75,7 +69,6 @@ public class LogTransactionService {
 
         if (transaction.getOriginAccount().getId() != transaction.getDestinationAccount().getId()) {
             return errorTransaction(transaction, "Origin and destination account must be the same");
-//            throw new TransactionException.AccountException("Origin and destination account must be the same");
         }
 
         transaction.setTransactionStatus(Status.PENDING);
@@ -86,12 +79,12 @@ public class LogTransactionService {
             bankAccountService.withdraw(transaction.getOriginAccount(), amount);
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
+            deleteLogTransaction(transaction, true);
             return "Transferência realizada com sucesso";
         } else {
+            deleteLogTransaction(transaction, false);
             return errorTransaction(transaction, "Insufficient funds");
         }
-
-        // TODO: Usa o kafka pra mandar se deu sucesso ou falha (String)
     }
 
     private String depositTransaction(Transaction transaction) {
@@ -99,7 +92,6 @@ public class LogTransactionService {
 
         if (transaction.getOriginAccount().getId() != transaction.getDestinationAccount().getId()) {
             return errorTransaction(transaction, "Origin and destination account must be the same");
-//            throw new TransactionException.AccountException("Origin and destination account must be the same");
         }
 
         transaction.setTransactionStatus(Status.PENDING);
@@ -109,6 +101,7 @@ public class LogTransactionService {
         bankAccountService.deposit(transaction.getDestinationAccount(), amount);
         transaction.setTransactionStatus(Status.SUCCESS);
         transactionService.updateTransaction(transaction, transaction.getId());
+        deleteLogTransaction(transaction, true);
         return "Transferência realizada com sucesso";
     }
 
@@ -117,7 +110,6 @@ public class LogTransactionService {
 
         if (transaction.getOriginAccount().getId() == transaction.getDestinationAccount().getId()) {
             return errorTransaction(transaction, "Origin and destination account must be different");
-//            throw new TransactionException.AccountException("Origin and destination account must be different");
         }
 
         transaction.setTransactionStatus(Status.PENDING);
@@ -128,8 +120,10 @@ public class LogTransactionService {
             bankAccountService.transfer(transaction.getOriginAccount(), transaction.getDestinationAccount(), amount);
             transaction.setTransactionStatus(Status.SUCCESS);
             transactionService.updateTransaction(transaction, transaction.getId());
+            deleteLogTransaction(transaction, true);
             return "Transferência realizada com sucesso";
         } else {
+            deleteLogTransaction(transaction, false);
             return errorTransaction(transaction, "Insufficient funds");
         }
     }
@@ -149,7 +143,6 @@ public class LogTransactionService {
         transaction.setTransactionStatus(Status.FAILED);
         transactionService.updateTransaction(transaction, transaction.getId());
         deleteLogTransaction(transaction, false);
-//        throw new BankAccountException.InsufficientFundsException("Insufficient funds");
-        return message;
+        return "Error: " + message;
     }
 }
